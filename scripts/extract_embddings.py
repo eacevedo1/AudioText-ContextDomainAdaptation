@@ -82,7 +82,7 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         args.device = "cuda"
     elif torch.backends.mps.is_available():
-        args.device = "mps" 
+        args.device = "mps"
     else:
         args.device = "cpu"
 

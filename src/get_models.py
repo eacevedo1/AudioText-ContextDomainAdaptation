@@ -1,4 +1,4 @@
-## Script to load models
+# Import libraries
 import os
 import sys
 
