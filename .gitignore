@@ -1,0 +1,15 @@
+# Ignore pycache folders
+__pycache__/
+
+# Ignore .DS_Store
+.DS_Store
+
+# Ignore all folders inside models/
+models/*/
+
+# Ignore all folders inside data/input/
+data/input/*/
+
+# Ignore all folders inside data/embeddings/
+data/embeddings/*
+!data/embeddings/.gitkeep
