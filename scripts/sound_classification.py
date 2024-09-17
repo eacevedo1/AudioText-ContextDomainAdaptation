@@ -25,8 +25,8 @@ import src.get_datasets as get_datasets
 from src.get_embedding import load_embeddings
 from src.metrics import accuracy_score
 from src.sound_classification_utils import (get_centroid_prototypes,
-                                            get_tgap_prototypes,
-                                            get_text_anchors)
+                                            get_text_anchors,
+                                            get_tgap_prototypes)
 
 
 def main(args):
@@ -40,7 +40,7 @@ def main(args):
     label_map = train_set.get_label_map()
 
     if args.mode == "zs" or args.mode == "tgap":
-        
+
         # Get the text-anchors embeddings
         text_features = get_text_anchors(label_map)
 
@@ -65,11 +65,9 @@ def main(args):
 
         # Mode text-guided audio prototypes (tgap) - Uses the text-anchors embeddings to guide the audio prototypes
         elif args.mode == "tgap":
-                
+
             # Get the text-guided audio prototypes
-            audio_prototypes = get_tgap_prototypes(
-                label_map, train_embd, text_features
-            )
+            audio_prototypes = get_tgap_prototypes(label_map, train_embd, text_features)
 
             # Get the logits
             logits_audio_text = (test_embd @ audio_prototypes.t()).detach().cpu()

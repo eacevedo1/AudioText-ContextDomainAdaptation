@@ -66,6 +66,7 @@ def get_centroid_prototypes(label_map, train_embd, train_gt):
 
     return centroid_prototypes
 
+
 def get_tgap_prototypes(label_map, train_embd, text_features, topn=35):
     """
     Get the text-guided audio prototypes for the sound classification
@@ -81,10 +82,10 @@ def get_tgap_prototypes(label_map, train_embd, text_features, topn=35):
 
     # Create the zero tensor to store the text-guided audio prototypes
     audio_prototypes = torch.zeros(len(label_map), train_embd.shape[1])
-    
+
     # Get the logits
     logits_audio_text = (train_embd @ text_features.t()).detach().cpu()
-    
+
     # Iterate over the classes
     for label_idx, label_name in label_map.items():
 
