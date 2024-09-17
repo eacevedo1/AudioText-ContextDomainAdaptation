@@ -22,6 +22,7 @@ ROOT_DIR = git.Repo(".", search_parent_directories=True).working_tree_dir
 sys.path.append(ROOT_DIR)
 
 import src.get_datasets as get_datasets
+from src.domain_adaptation_utils import get_background_profile_text
 from src.get_embedding import load_embeddings
 from src.metrics import accuracy_score
 from src.sound_classification_utils import (get_centroid_prototypes,
@@ -31,6 +32,9 @@ from src.sound_classification_utils import (get_centroid_prototypes,
 
 def main(args):
 
+    # Set Temperature value
+    TEMPERATURE = args.temperature
+
     # Define the embeddings dictionary object wich contains the filenames, embeddings, ground truth and folds
     embd_dict_obj = load_embeddings(args.embeddings_path)
 
@@ -39,10 +43,20 @@ def main(args):
     train_set = dataset(folder_path=None)
     label_map = train_set.get_label_map()
 
-    if args.mode == "zs" or args.mode == "tgap":
+    # Get the text-anchors embeddings
+    text_features = get_text_anchors(label_map)
 
-        # Get the text-anchors embeddings
-        text_features = get_text_anchors(label_map)
+    if args.modality == "text":
+        # Extract the background types
+        bg_types = [
+            key.split("-")[-2].replace("_", " ") for key in embd_dict_obj.audios_key
+        ]
+
+        # Check if there are multiple background types
+        if len(set(bg_types)) > 1:
+            raise ValueError(f"Multiple background types found: {set(bg_types)}")
+
+        bg_profile = get_background_profile_text(bg_types[0], text_features)
 
     # List to store the accuracies
     acc_list = []
@@ -61,7 +75,7 @@ def main(args):
         if args.mode == "zs":
 
             # Get the logits
-            logits_audio_text = (test_embd @ text_features.t()).detach().cpu()
+            ss_profile = (test_embd @ text_features.t()).detach().cpu()
 
         # Mode text-guided audio prototypes (tgap) - Uses the text-anchors embeddings to guide the audio prototypes
         elif args.mode == "tgap":
@@ -70,7 +84,7 @@ def main(args):
             audio_prototypes = get_tgap_prototypes(label_map, train_embd, text_features)
 
             # Get the logits
-            logits_audio_text = (test_embd @ audio_prototypes.t()).detach().cpu()
+            ss_profile = (test_embd @ audio_prototypes.t()).detach().cpu()
 
         # Mode supervised (sv) - Uses the centroids of each class to classify the audio embeddings
         elif args.mode == "sv":
@@ -81,10 +95,14 @@ def main(args):
             )
 
             # Get the logits
-            logits_audio_text = (test_embd @ centroid_prototypes.t()).detach().cpu()
+            ss_profile = (test_embd @ centroid_prototypes.t()).detach().cpu()
+
+        # Apply domain adaptation if selected
+        if args.modality is not None:
+            ss_profile = ss_profile - (bg_profile * TEMPERATURE)
 
         # Apply softmax and get the predicted labels
-        conf, idx = torch.softmax(logits_audio_text, dim=-1).topk(1, dim=-1)
+        conf, idx = torch.softmax(ss_profile, dim=-1).topk(1, dim=-1)
 
         # Get the predicted labels
         y_pred = idx.squeeze().numpy()
@@ -122,6 +140,22 @@ if __name__ == "__main__":
         "--dataset",
         type=str,
         help="E.g. urbansound8k, ...",
+    )
+
+    # Domain Adaptation Modality
+    parser.add_argument(
+        "--modality",
+        type=str,
+        default=None,
+        help="Modality to be used for domain adaptation. E.g. 'text' or 'audio'. None for no domain adaptation.",
+    )
+
+    # Temperature for domain adaptation
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.2,
+        help="Temperature to be used for domain adaptation.",
     )
 
     # Define train type (zero-shot(zs), text-guided audio prototypes(tgap) or supervised(sv))
