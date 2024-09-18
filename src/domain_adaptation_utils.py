@@ -12,12 +12,13 @@ sys.path.append(ROOT_DIR)
 import src.get_models as get_models
 
 
-def get_background_profile_text(bg_type, text_features):
+def get_background_profile_text(bg_type, prototypes):
     """
     Get the background profile embeddings for domain adaptation
 
     Args:
         bg_type: string containing the background type
+        prototypes: tensor containing the prototypes of the classes
 
     Returns:
         bg_embd: tensor containing the background profile embeddings
@@ -38,7 +39,7 @@ def get_background_profile_text(bg_type, text_features):
     bg_embd = model.get_text_embedding(prompts)
 
     # Get the background profile embeddings
-    background_profiles = (torch.tensor(bg_embd) @ text_features.t()).detach().cpu()
+    background_profiles = (torch.tensor(bg_embd) @ prototypes.t()).detach().cpu()
 
     # Take the mean of the background profile embeddings
     background_profile = background_profiles.mean(dim=0)

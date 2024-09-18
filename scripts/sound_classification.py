@@ -46,6 +46,7 @@ def main(args):
     # Get the text-anchors embeddings
     text_features = get_text_anchors(label_map)
 
+    # Get the background type for domain adaptation using text
     if args.modality == "text":
         # Extract the background types
         bg_types = [
@@ -55,8 +56,6 @@ def main(args):
         # Check if there are multiple background types
         if len(set(bg_types)) > 1:
             raise ValueError(f"Multiple background types found: {set(bg_types)}")
-
-        bg_profile = get_background_profile_text(bg_types[0], text_features)
 
     # List to store the accuracies
     acc_list = []
@@ -77,6 +76,10 @@ def main(args):
             # Get the logits
             ss_profile = (test_embd @ text_features.t()).detach().cpu()
 
+            # Get the background profile for domain adaptation
+            if args.modality == "text":
+                bg_profile = get_background_profile_text(bg_types[0], text_features)
+
         # Mode text-guided audio prototypes (tgap) - Uses the text-anchors embeddings to guide the audio prototypes
         elif args.mode == "tgap":
 
@@ -85,6 +88,10 @@ def main(args):
 
             # Get the logits
             ss_profile = (test_embd @ audio_prototypes.t()).detach().cpu()
+
+            # Get the background profile for domain adaptation
+            if args.modality == "text":
+                bg_profile = get_background_profile_text(bg_types[0], audio_prototypes)
 
         # Mode supervised (sv) - Uses the centroids of each class to classify the audio embeddings
         elif args.mode == "sv":
@@ -96,6 +103,12 @@ def main(args):
 
             # Get the logits
             ss_profile = (test_embd @ centroid_prototypes.t()).detach().cpu()
+
+            # Get the background profile for domain adaptation
+            if args.modality == "text":
+                bg_profile = get_background_profile_text(
+                    bg_types[0], centroid_prototypes
+                )
 
         # Apply domain adaptation if selected
         if args.modality is not None:
@@ -154,7 +167,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--temperature",
         type=float,
-        default=0.2,
+        default=0.4,
         help="Temperature to be used for domain adaptation.",
     )
 
