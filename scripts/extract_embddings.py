@@ -37,12 +37,12 @@ def main(args):
     feat_data = get_embd(train_set, feat_data, args)
 
     # Save the embeddings
-    now = datetime.datetime.now().strftime("%Y%m%d%H%M")
+    now = datetime.datetime.now().strftime("%H%M")
     save_path = os.path.join(
         ROOT_DIR,
         "data",
         "embeddings",
-        f"{args.dataset}-{now}.pt" if args.path is None else f"{args.path}-{now}.pt",
+        f"{args.dataset}_{now}.pt" if args.path is None else f"{args.path}_{now}.pt",
     )
     torch.save(feat_data, save_path)
     print(f"Embeddings saved at: {save_path}")

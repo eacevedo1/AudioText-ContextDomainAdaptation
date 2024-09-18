@@ -26,13 +26,11 @@ class urbansound8k_Dataset(Dataset):
             )
         else:
             self.dataset_folder_path = os.path.join(
-                ROOT_DIR, "data", "input", "urbansound8k"
+                ROOT_DIR, "data", "input", "urbansound8k", "audio"
             )
 
         # Get all audio files paths
-        self.paths = glob(
-            os.path.join(self.dataset_folder_path, "audio", "fold*/*.wav")
-        )
+        self.paths = glob(os.path.join(self.dataset_folder_path, "fold*/*.wav"))
 
         # Get the label map
         self.label_map = self.get_label_map()
