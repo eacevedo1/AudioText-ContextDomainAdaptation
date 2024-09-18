@@ -46,7 +46,7 @@ class urbansound8k_Dataset(Dataset):
         """
         Returns the number of folds in the dataset
         """
-        return len(glob(self.audio_base_path + "fold*"))
+        return len(glob(self.dataset_folder_path + "fold*"))
 
     def get_label_map(self):
         """
@@ -68,3 +68,105 @@ class urbansound8k_Dataset(Dataset):
         label_map = dict(sorted(label_map.items()))
 
         return label_map
+
+
+# TAU Urban Acoustic Scenes 2019 Dataset Class
+class tau2019uas_Dataset(Dataset):
+    """
+    Dataset class for the TAU Urban Acoustic Scenes 2019 dataset.
+    """
+
+    def __init__(self, **kwargs):
+        super(tau2019uas_Dataset, self).__init__()
+
+        # See if the folder path is provided
+        if kwargs["folder_path"] is None:
+            self.dataset_folder_path = os.path.join(
+                ROOT_DIR,
+                "data",
+                "input",
+                "tau2019uas",
+                "TAU-urban-acoustic-scenes-2019-development",
+            )
+
+        # Get all the paths of the audio files (both in subdirectories and directly in the audio folder)
+        # This is for the case when the dataset is sorted or unsorted
+        self.paths = glob(self.dataset_folder_path + "audio/*/*.wav") + glob(
+            self.dataset_folder_path + "audio/*.wav"
+        )
+
+        # Get the label map
+        self.label_map = self.get_label_map()
+
+        # Get the fold dictionary
+        self.fold_dict = self.get_fold_dict()
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, idx):
+        path = self.paths[idx]
+        return path
+
+    def get_label_map(self):
+        """
+        Returns the label map for the TAU Urban Acoustic Scenes 2019 dataset
+        """
+
+        # Load the metadata
+        df = pd.read_csv(os.path.join(self.dataset_folder_path, "meta.csv"), sep="\t")
+
+        # Get the unique labels
+        labels = df["scene_label"].unique()
+
+        # Create a dictionary with classID as key and label as value
+        return dict(zip(range(len(labels)), labels))
+
+    def get_fold_dict(self):
+        """
+        Returns the fold dictionary for the TAU Urban Acoustic Scenes 2019 dataset.
+        This dictionary contains the fold number for each audio file.
+        """
+
+        # Load Train Metadata
+        df_fold_train = pd.read_csv(
+            os.path.join(
+                self.dataset_folder_path, "evaluation_setup", "fold1_train.csv"
+            ),
+            sep="\t",
+        )
+        df_fold_train["fold"] = 1
+        df_fold_train.drop(columns=["scene_label"], inplace=True)
+
+        # Load Validation Metadata
+        df_fold_val = pd.read_csv(
+            os.path.join(
+                self.dataset_folder_path, "evaluation_setup", "fold1_evaluate.csv"
+            ),
+            sep="\t",
+        )
+        df_fold_val["fold"] = 2
+        df_fold_val.drop(columns=["scene_label"], inplace=True)
+
+        # Load Test Metadata
+        df_fold_test = pd.read_csv(
+            os.path.join(
+                self.dataset_folder_path, "evaluation_setup", "fold1_test.csv"
+            ),
+            sep="\t",
+        )
+        df_fold_test["fold"] = 3
+
+        # Concatenate the dataframes to get the fold number for each audio file
+        df = pd.concat([df_fold_train, df_fold_val, df_fold_test], axis=0)
+
+        return df.set_index("filename")["fold"].to_dict()
+
+    def get_fold(self, path):
+        """
+        Returns the fold number for the given audio filename.
+        """
+        try:
+            return self.fold_dict["audio/" + path.split("/")[-1]]
+        except:
+            return 4
