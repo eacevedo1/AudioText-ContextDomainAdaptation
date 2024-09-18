@@ -22,7 +22,8 @@ ROOT_DIR = git.Repo(".", search_parent_directories=True).working_tree_dir
 sys.path.append(ROOT_DIR)
 
 import src.get_datasets as get_datasets
-from src.domain_adaptation_utils import get_background_profile_text
+from src.domain_adaptation_utils import (get_background_profile_audio,
+                                         get_background_profile_text)
 from src.get_embedding import load_embeddings
 from src.metrics import accuracy_score
 from src.sound_classification_utils import (get_centroid_prototypes,
@@ -35,13 +36,17 @@ def main(args):
     # Set Temperature value
     TEMPERATURE = args.temperature
 
-    # Define the embeddings dictionary object wich contains the filenames, embeddings, ground truth and folds
+    # Define the embeddings dictionary object which contains the filenames, embeddings, ground truth and folds
     embd_dict_obj = load_embeddings(args.embeddings_path)
 
     # Load label map
     dataset = getattr(get_datasets, f"{args.dataset}_Dataset")
     train_set = dataset(folder_path=None)
     label_map = train_set.get_label_map()
+
+    # Define the embeddings dictionary object whichi contains the filenames, embeddings, ground truth and folds of backgrounds
+    if args.modality == "audio":
+        bg_embd_dict_obj = load_embeddings(args.bg_embeddings_path)
 
     # Get the text-anchors embeddings
     text_features = get_text_anchors(label_map)
@@ -79,6 +84,14 @@ def main(args):
             # Get the background profile for domain adaptation
             if args.modality == "text":
                 bg_profile = get_background_profile_text(bg_types[0], text_features)
+            elif args.modality == "audio":
+                bg_profile = get_background_profile_audio(
+                    args.embeddings_path.split("_")[0],
+                    bg_embd_dict_obj,
+                    test_key,
+                    test_fold,
+                    text_features,
+                )
 
         # Mode text-guided audio prototypes (tgap) - Uses the text-anchors embeddings to guide the audio prototypes
         elif args.mode == "tgap":
@@ -92,6 +105,14 @@ def main(args):
             # Get the background profile for domain adaptation
             if args.modality == "text":
                 bg_profile = get_background_profile_text(bg_types[0], audio_prototypes)
+            elif args.modality == "audio":
+                bg_profile = get_background_profile_audio(
+                    args.embeddings_path.split("_")[0],
+                    bg_embd_dict_obj,
+                    test_key,
+                    test_fold,
+                    audio_prototypes,
+                )
 
         # Mode supervised (sv) - Uses the centroids of each class to classify the audio embeddings
         elif args.mode == "sv":
@@ -108,6 +129,14 @@ def main(args):
             if args.modality == "text":
                 bg_profile = get_background_profile_text(
                     bg_types[0], centroid_prototypes
+                )
+            elif args.modality == "audio":
+                bg_profile = get_background_profile_audio(
+                    args.embeddings_path.split("_")[0],
+                    bg_embd_dict_obj,
+                    test_key,
+                    test_fold,
+                    centroid_prototypes,
                 )
 
         # Apply domain adaptation if selected
@@ -127,12 +156,12 @@ def main(args):
         acc_list.append(curr_acc)
 
         # Print the accuracy for the current fold
-        print(f" Fold={fold}, acc/mAP={curr_acc}%")
+        print(f" Fold={fold}, acc/mAP={curr_acc:.3f}%")
 
         # Calculate the mean accuracy
     mean_acc = np.mean(acc_list)
     print(
-        f" Final score: Model=LAION-CLAP, train_type={args.mode}, acc/mAP={mean_acc}%"
+        f" Final score: Model=LAION-CLAP, train_type={args.mode}, acc/mAP={mean_acc:.3f}%"
     )
 
     return
@@ -167,8 +196,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--temperature",
         type=float,
-        default=0.4,
+        default=0.5,
         help="Temperature to be used for domain adaptation.",
+    )
+
+    # Embeddings path where the background embeddings dictionary is stored
+    # Only needed for Audio domain adaptation
+    parser.add_argument(
+        "--bg_embeddings_path",
+        type=str,
+        help="Path to the embeddings file.",
     )
 
     # Define train type (zero-shot(zs), text-guided audio prototypes(tgap) or supervised(sv))
