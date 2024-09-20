@@ -170,3 +170,33 @@ class tau2019uas_Dataset(Dataset):
             return self.fold_dict["audio/" + path.split("/")[-1]]
         except:
             return 4
+
+
+# Custom Dataset Class
+class custom_Dataset(Dataset):
+    """
+    Dataset class for custom datasets.
+    This dataset takes all the audio files in the dataset folder.
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Parameters:
+            dataset_folder_path (str): The path to the dataset folder
+        """
+        super(custom_Dataset, self).__init__()
+
+        # Get the dataset folder path
+        self.dataset_folder_path = self.dataset_folder_path = os.path.join(
+            ROOT_DIR, "data", "input", kwargs["folder_path"]
+        )
+
+        # Get all the paths of the audio files
+        self.paths = glob(self.dataset_folder_path + "/*.wav")
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, idx):
+        path = self.paths[idx]
+        return path

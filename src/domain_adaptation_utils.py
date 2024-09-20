@@ -88,3 +88,14 @@ def get_background_profile_audio(
     background_profile = (backgrounds_embddings @ prototypes.t()).detach().cpu()
 
     return background_profile
+
+
+def get_background_profile_audio_inference(bg_embd, prototypes):
+
+    # Get the background profile embeddings
+    background_profiles = (bg_embd @ prototypes.t()).detach().cpu()
+
+    # Take the mean of the background profile embeddings
+    background_profile = background_profiles.mean(dim=0)
+
+    return background_profile

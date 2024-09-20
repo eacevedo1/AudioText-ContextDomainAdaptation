@@ -137,3 +137,38 @@ class load_embeddings:
         audios_fold = self.audios_fold[idxs]
 
         return audios_key, audios_embd, audios_gt, audios_fold
+
+
+# Function to get the embeddings for the Custom dataset
+def get_custom_embeddings(train_set, feat_data, args):
+    """
+    Returns the embeddings for the Custom dataset
+    """
+    # Load the dataset
+    train_dataloader = DataLoader(
+        train_set, batch_size=64, shuffle=False, num_workers=args.num_workers
+    )
+
+    # Load the model
+    get_model = getattr(get_models, f"get_LAIONCLAP_model")
+    model = get_model()
+
+    # Iterate over the dataset
+    for paths in tqdm(train_dataloader):
+        audio_embd = None
+
+        # Get the embeddings of a batch of audio files
+        audio_embd = model.get_audio_embedding_from_filelist(paths)
+
+        # Store the embeddings and metadata
+        for idx, embd in enumerate(audio_embd):
+            # Get the file name, label and fold of each audio file of the batch
+            path = paths[idx]
+            file_name = None
+            file_name = path.split("/")[-1]
+
+            # Store the label, embeddings and fold
+            feat_data[file_name] = {}
+            feat_data[file_name]["embd"] = embd
+
+    return feat_data
