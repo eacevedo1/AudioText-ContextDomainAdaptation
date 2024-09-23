@@ -45,7 +45,7 @@ echo 'Step 3: Create conda environment'
 conda create --name atm-domain-adapt python=3.9
 conda activate atm-domain-adapt
 cd /scratch/ea3418/me-uyr-trans-exp/AudioText-ContextDomainAdaptation
-pip install -r requirements.txt\
+pip install -r requirements.txt
 echo 'Step 4: Download the model'
 mkdir -p models/LAION-CLAP
 wget -P models/LAION-CLAP https://huggingface.co/lukewys/laion_clap/resolve/main/630k-audioset-fusion-best.pt
