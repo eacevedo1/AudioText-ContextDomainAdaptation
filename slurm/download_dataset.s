@@ -8,7 +8,7 @@
 #SBATCH --mem=4GB
 #SBATCH --output=/scratch/ea3418/download_datasets.out
 
-cd /scratch/ea3418/me-uyr-trans-exp/singularity-atm-da-51256483
+cd /scratch/ea3418/me-uyr-trans-exp/singularity-atm-da-51257214
 
 singularity \
     exec \
