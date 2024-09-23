@@ -36,7 +36,7 @@ echo 'Step 1: Install Miniconda'
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh -b -p /ext3/miniconda3
 rm Miniconda3-latest-Linux-x86_64.sh
-cp /scratch/ea3418/me-uyr-trans-exp/me-uyr-transformation-2024/slurm/env.sh /ext3/env.sh
+cp /scratch/ea3418/me-uyr-trans-exp/AudioText-ContextDomainAdaptation/slurm/env.sh /ext3/env.sh
 source /ext3/env.sh
 conda update -n base conda -y
 conda clean --all --yes
