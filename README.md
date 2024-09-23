@@ -63,9 +63,9 @@ python3 scripts/extract_embddings.py --dataset urbansound8k --path urbansound8k-
 ```
 
 **Parameters:**
-- --dataset: The name of the dataset from which you want to extract embeddings (e.g., urbansound8k, tau2019uas).
-- --path: The folder path of the augmented dataset or original dataset. If working with an augmented dataset, provide the folder path (e.g., urbansound8k-20240705184401); otherwise, set it to None.
-- --num_workers: (Optional) The number of workers to use for extracting embeddings (default: 1).
+- `--dataset`: The name of the dataset from which you want to extract embeddings (e.g., urbansound8k, tau2019uas).
+- `--path`: The folder path of the augmented dataset or original dataset. If working with an augmented dataset, provide the folder path (e.g., urbansound8k-20240705184401); otherwise, set it to None.
+- `--num_workers`: (Optional) The number of workers to use for extracting embeddings (default: 1).
 
 The embeddings will be saved as a `.pt` file in the `data/embeddings/` directory. The filename will follow the format `<dataset_name>_<timestamp>.pt`. 
 
@@ -81,15 +81,15 @@ python3 scripts/sound_classification.py --embeddings_path <embeddings_path> --da
 
 **Parameters:**
 
-- --embeddings_path: The path to the pre-computed embeddings file.
-- --dataset: The name of the dataset for classification (e.g., urbansound8k).
-- --modality: (Optional) The modality to be used for domain adaptation. Set to 'text' for text-guided prototypes, 'audio' for audio-based background profiles, or None if no domain adaptation is needed.
-- --temperature: (Optional) The temperature value for domain adaptation (default: 0.5).
-- --bg_embeddings_path: (Optional) The path to the background embeddings file (only needed for audio domain adaptation).
-- --mode: The training mode for classification. Choose from:
-    * zs: Zero-shot classification.
-    * tgap: Text-guided audio prototypes.
-    * sv: Supervised classification.
+- `--embeddings_path`: The path to the pre-computed embeddings file.
+- `--dataset`: The name of the dataset for classification (e.g., urbansound8k).
+- `--modality`: (Optional) The modality to be used for domain adaptation. Set to 'text' for text-guided prototypes, 'audio' for audio-based background profiles, or None if no domain adaptation is needed.
+- `--temperature`: (Optional) The temperature value for domain adaptation (default: 0.5).
+- `--bg_embeddings_path`: (Optional) The path to the background embeddings file (only needed for audio domain adaptation).
+- `--mode`: The training mode for classification. Choose from:
+    * `zs`: Zero-shot classification.
+    * `tgap`: Text-guided audio prototypes.
+    * `sv`: Supervised classification.
 
 The script will output accuracy metrics for each fold of the dataset and display the final classification score.
 
@@ -100,3 +100,42 @@ python3 scripts/sound_classification.py --embeddings_path embeddings/urbansound8
 ```
 
 This example runs zero-shot classification on the urbansound8k dataset using the pre-computed embeddings.
+
+## Inference Classification with Domain Adaptation
+
+This script performs sound classification inference on audio files using domain adaptation techniques. The script can apply domain adaptation with either text or audio modalities to enhance classification accuracy. To run inference classification with domain adaptation, use the following command:
+
+```
+python3 scripts/inference_classification.py --class_labels <class_labels_path> --audio_folder_path <audio_folder_path> --modality <modality> --temperature <temperature>
+```
+
+**Parameters:**
+
+- `--class_labels`: Path to the file containing the class labels (required).
+- `--audio_folder_path`: Path to the folder containing the audio files to classify (required).
+- `--modality`: Modality to use for domain adaptation. Options are:
+    * `'text'` for text-based domain adaptation.
+    * `'audio'` for audio-based domain adaptation.
+None if no domain adaptation is needed.
+- `--temperature`: (Optional) The temperature value for domain adaptation, default is 0.5.
+- `--bg_type`: Specifies the type of background for text-based domain adaptation (e.g., park, airport, street traffic). Needed in case of using domain adpatation with modality `'text'`. 
+- `--bg_folder_path`: Path to the folder containing background audio files for audio-based domain adaptation. Needed in case of using domain adpatation with modality `'audio'`. 
+- `--num_workers`: (Optional) Number of workers to use for embedding extraction (default: 1).
+
+The script processes the audio files from the specified folder, computes embeddings, applies domain adaptation if specified, and saves the classification results along with confidence scores.
+
+1. Example Usage:
+
+```
+python3 scripts/inference_classification.py --class_labels class_labels.txt --audio_folder_path demo/inference_demo --modality text --temperature 0.5 --bg_type park
+```
+
+This example runs inference on audio files in the test_audios folder using text-based domain adaptation with a park background profile.
+
+2. Example Usage:
+
+```
+python3 scripts/inference_classification.py --class_labels class_labels.txt --audio_folder_path demo/inference_demo --modality audio --temperature 0.5 --bg_folder_path demo/inference_bg_demo
+```
+
+This example runs inference on audio files in the test_audios folder using audio-based domain adaptation with a park background profile.
