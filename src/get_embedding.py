@@ -54,6 +54,47 @@ def get_urbansound8k_embeddings(train_set, feat_data, args):
 
     return feat_data
 
+def get_tau2019uas_embeddings(train_set, feat_data, args):
+    """
+    Returns the embeddings for the TAU Urban Acoustic Scenes 2019 dataset
+    """
+    # Load the dataset
+    train_dataloader = DataLoader(
+        train_set, batch_size=64, shuffle=False, num_workers=args.num_workers
+    )
+
+    # Load the model
+    get_model = getattr(get_models, f"get_LAIONCLAP_model")
+    model = get_model()
+
+    # Change the key and value of the label map
+    label_map = {v: k for k, v in train_set.label_map.items()}
+
+    # Iterate over the dataset
+    for paths in tqdm(train_dataloader):
+        audio_embd = None
+
+        # Get the embeddings of a batch of audio files
+        audio_embd = model.get_audio_embedding_from_filelist(paths)
+
+        # Store the embeddings and metadata
+        for idx, embd in enumerate(audio_embd):
+            path = paths[idx]
+
+            # Get the file name, label and fold
+            file_name, label, fold = None, None, None
+
+            file_name = path.split("/")[-1]
+            label = label_map[path.split("/")[-2]]
+            fold = train_set.get_fold(file_name)
+
+            # Store the label, embeddings and fold
+            feat_data[file_name] = {}
+            feat_data[file_name]["class_gt"] = label
+            feat_data[file_name]["embd"] = embd
+            feat_data[file_name]["fold"] = fold
+
+    return feat_data
 
 # Class to load the embeddings for any dataset
 class load_embeddings:
