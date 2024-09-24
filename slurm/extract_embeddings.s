@@ -30,8 +30,8 @@ source /ext3/env.sh
 conda activate atm-domain-adapt
 cd /scratch/ea3418/me-uyr-trans-exp/AudioText-ContextDomainAdaptation
 for us8k_folder in $US8k_FOLDER_PATHS; do
-  echo '-- Extracting embeddings from UrbanSound8K folder: $us8k_folder --'
-  python3 scripts/extract_embeddings.py --dataset urbansound8k --folder \$us8k_folder
+  echo '-- Extracting embeddings from UrbanSound8K path: $us8k_folder --'
+  python3 scripts/extract_embeddings.py --dataset urbansound8k --path \$us8k_folder
 done
 echo '-- Extracting embeddings from TAU Urban Acoustic Scenes 2019 --'
 python3 scripts/extract_embeddings.py --dataset tau2019uas
