@@ -91,8 +91,8 @@ class tau2019uas_Dataset(Dataset):
 
         # Get all the paths of the audio files (both in subdirectories and directly in the audio folder)
         # This is for the case when the dataset is sorted or unsorted
-        self.paths = glob(self.dataset_folder_path + "audio/*/*.wav") + glob(
-            self.dataset_folder_path + "audio/*.wav"
+        self.paths = glob(self.dataset_folder_path + "/audio/*/*.wav") + glob(
+            self.dataset_folder_path + "/audio/*.wav"
         )
 
         # Get the label map
