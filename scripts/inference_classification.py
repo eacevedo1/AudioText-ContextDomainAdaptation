@@ -9,6 +9,7 @@
 # Import libraries
 import argparse
 import sys
+from datetime import datetime
 
 import git
 import torch
@@ -73,7 +74,10 @@ def main(args):
     conf, idx = torch.softmax(ss_profile, dim=-1).topk(1, dim=-1)
 
     # Save the results
-    save_results_inference(test_keys, idx, conf, label_map)
+    now = datetime.now().strftime("%H%M%S")
+    save_results_inference(
+        test_keys, idx, conf, label_map, filename=f"results_{now}.csv"
+    )
 
     return
 
