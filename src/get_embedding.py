@@ -54,6 +54,7 @@ def get_urbansound8k_embeddings(train_set, feat_data, args):
 
     return feat_data
 
+
 def get_tau2019uas_embeddings(train_set, feat_data, args):
     """
     Returns the embeddings for the TAU Urban Acoustic Scenes 2019 dataset
@@ -95,6 +96,7 @@ def get_tau2019uas_embeddings(train_set, feat_data, args):
             feat_data[file_name]["fold"] = fold
 
     return feat_data
+
 
 # Class to load the embeddings for any dataset
 class load_embeddings:
