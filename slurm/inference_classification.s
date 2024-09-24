@@ -20,7 +20,7 @@ singularity \
 source /ext3/env.sh
 conda activate atm-domain-adapt
 cd /scratch/ea3418/me-uyr-trans-exp/AudioText-ContextDomainAdaptation
-python3 scripts/inference_classification.py --class_labels classes_demo.txt \ 
+python3 scripts/inference_classification.py --class_labels classes_demo.txt \
                                             --audio_folder_path demo/inference_demo \
                                             --modality text \
                                             --temperature 0.5 \
