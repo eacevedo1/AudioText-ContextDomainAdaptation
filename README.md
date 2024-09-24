@@ -54,12 +54,12 @@ This codes generates a new dataset of `urbansound8k` with files in folds 1,2 and
 
 ## Exctract Audio Embeddings 
 
-To extract embeddings from a dataset, use the `scripts/extract_embddings.py` script. This script processes the audio data and saves the extracted embeddings to a file.
+To extract embeddings from a dataset, use the `scripts/extract_embeddings.py` script. This script processes the audio data and saves the extracted embeddings to a file.
 
 Example command to extract embeddings from the urbansound8k dataset:
 
 ```
-python3 scripts/extract_embddings.py --dataset urbansound8k --path urbansound8k-20240705184401
+python3 scripts/extract_embeddings.py --dataset urbansound8k --path urbansound8k-20240705184401
 ```
 
 **Parameters:**
