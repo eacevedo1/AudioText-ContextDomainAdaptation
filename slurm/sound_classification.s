@@ -9,13 +9,13 @@
 #SBATCH --mem=18GB
 #SBATCH --output=/scratch/ea3418/sound_classification_%j.out
 
-EMBEDDINGS_PATH="urbansound8k_1030.pt \
-                 urbansound8k-20240923151200_1038.pt \
-                 urbansound8k-20240923161033_1054.pt \
-                 urbansound8k-20240923171455_1109.pt \
-                 urbansound8k-20240923180514_1046.pt \
-                 urbansound8k-20240923185657_1102.pt \
-                 urbansound8k-20240923195207_1119.pt" 
+EMBEDDINGS_PATH="urbansound8k_1219.pt \
+                 urbansound8k-20240923151200_1228.pt \
+                 urbansound8k-20240923161033_1245.pt \
+                 urbansound8k-20240923171455_1302.pt \
+                 urbansound8k-20240923180514_1236.pt \
+                 urbansound8k-20240923185657_1253.pt \
+                 urbansound8k-20240923195207_1311.pt"
 
 TRAIN_MODES="zs tgap sv"
 
@@ -46,14 +46,16 @@ done
 for embeddings_path in $EMBEDDINGS_PATH; do
     for train_mode in $TRAIN_MODES; do
         for modality_mode in $MODALITY_MODES; do
-            echo '-- Domain Adaptation Sound classification -- \$embeddings_path -- \$train_mode -- \$modality_mode --'
-            python3 scripts/sound_classification.py --embeddings_path \$embeddings_path \
-                                                    --dataset urbansound8k \
-                                                    --mode \$train_mode \
-                                                    --modality \$modality_mode \
-                                                    --temperature \$temperature \
-                                                    --bg_embeddings_path tau2019uas_1143.pt \
-                                                    --save_results True
+            for temperature in $TEMPERATURES; do
+                echo '-- Domain Adaptation Sound classification -- \$embeddings_path -- \$train_mode -- \$modality_mode --'
+                python3 scripts/sound_classification.py --embeddings_path \$embeddings_path \
+                                                        --dataset urbansound8k \
+                                                        --mode \$train_mode \
+                                                        --modality \$modality_mode \
+                                                        --temperature \$temperature \
+                                                        --bg_embeddings_path tau2019uas_1327.pt \
+                                                        --save_results True
+            done
         done
     done
 done
