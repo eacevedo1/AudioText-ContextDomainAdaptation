@@ -10,8 +10,7 @@
 #SBATCH --output=/scratch/ea3418/extract_embd_%j.out
 
 # Define the folder of the UrbanSound8K datasets in a single variable
-US8k_FOLDER_PATHS="urbansound8k \
-                   urbansound8k-20240923151200 \
+US8k_FOLDER_PATHS="urbansound8k-20240923151200 \
                    urbansound8k-20240923180514 \
                    urbansound8k-20240923161033 \
                    urbansound8k-20240923185657 \
@@ -29,6 +28,7 @@ singularity \
 source /ext3/env.sh
 conda activate atm-domain-adapt
 cd /scratch/ea3418/me-uyr-trans-exp/AudioText-ContextDomainAdaptation
+python3 scripts/extract_embeddings.py --dataset urbansound8k 
 for us8k_folder in $US8k_FOLDER_PATHS; do
   echo '-- Extracting embeddings from UrbanSound8K path: $us8k_folder --'
   python3 scripts/extract_embeddings.py --dataset urbansound8k --path \$us8k_folder
