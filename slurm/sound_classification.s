@@ -42,7 +42,7 @@ for embeddings_path in $EMBEDDINGS_PATH; do
                                                     --dataset urbansound8k \
                                                     --mode \$train_mode \
                                                     --temperature \$temperature
-                                                    --background_embeddings_path $BACKGROUND_EMBEDDING_PATH \
+                                                    --bg_embeddings_path $BACKGROUND_EMBEDDING_PATH \
                                                     --save_results True
         done
     done

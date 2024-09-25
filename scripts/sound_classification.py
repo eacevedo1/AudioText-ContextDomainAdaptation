@@ -165,7 +165,7 @@ def main(args):
     )
 
     # Save the results
-    if args.save_results:
+    if args.save_results == "True":
         os.makedirs(os.path.join(ROOT_DIR, "results"), exist_ok=True)
         embedding_name = args.embeddings_path.split(".pt")[0]
         with open(
@@ -228,9 +228,9 @@ if __name__ == "__main__":
     # Save results
     parser.add_argument(
         "--save_results",
-        type=bool,
-        default=False,
-        help="Save the results in a file.",
+        type=str,
+        default=None,
+        help="'True' to save the results as a txt file.",
     )
 
     args = parser.parse_args()
