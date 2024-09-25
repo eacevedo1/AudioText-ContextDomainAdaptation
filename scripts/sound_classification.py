@@ -167,11 +167,12 @@ def main(args):
     # Save the results
     if args.save_results:
         os.makedirs(os.path.join(ROOT_DIR, "results"), exist_ok=True)
+        embedding_name = args.embeddings_path.split(".pt")[0]
         with open(
             os.path.join(
                 ROOT_DIR,
                 "results",
-                f"{args.dataset}_results_{args.mode}_{args.modality}_{TEMPERATURE}.txt",
+                f"{embedding_name}_results_{args.mode}_{args.modality}_{TEMPERATURE}.txt",
             ),
             "w",
         ) as f:
