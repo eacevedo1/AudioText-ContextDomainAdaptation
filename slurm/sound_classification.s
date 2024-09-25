@@ -21,8 +21,6 @@ TRAIN_MODES="zs tgap sv"
 
 TEMPERATURES="0.2 0.5 0.8"
 
-BACKGROUND_EMBEDDING_PATH="tau2019uas_1143.pt"
-
 cd /scratch/ea3418/me-uyr-trans-exp/singularity-atm-da-51257214
 
 singularity \
@@ -42,7 +40,7 @@ for embeddings_path in $EMBEDDINGS_PATH; do
                                                     --dataset urbansound8k \
                                                     --mode \$train_mode \
                                                     --temperature \$temperature
-                                                    --bg_embeddings_path $BACKGROUND_EMBEDDING_PATH \
+                                                    --bg_embeddings_path tau2019uas_1143.pt \
                                                     --save_results True
         done
     done
