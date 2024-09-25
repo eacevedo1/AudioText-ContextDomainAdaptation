@@ -164,6 +164,19 @@ def main(args):
         f" Final score: Model=LAION-CLAP, train_type={args.mode}, acc/mAP={mean_acc:.3f}%"
     )
 
+    # Save the results
+    if args.save_results:
+        os.makedirs(os.path.join(ROOT_DIR, "results"), exist_ok=True)
+        with open(
+            os.path.join(
+                ROOT_DIR,
+                "results",
+                f"{args.dataset}_results_{args.mode}_{args.modality}_{TEMPERATURE}.txt",
+            ),
+            "w",
+        ) as f:
+            f.write(f"Model=LAION-CLAP, train_type={args.mode}, acc/mAP={mean_acc:.3f}%")
+
     return
 
 
@@ -210,6 +223,14 @@ if __name__ == "__main__":
 
     # Define train type (zero-shot(zs), text-guided audio prototypes(tgap) or supervised(sv))
     parser.add_argument("--mode", type=str, default="zs", help="zs, tgap, sv")
+
+    # Save results
+    parser.add_argument(
+        "--save_results",
+        type=bool,
+        default=False,
+        help="Save the results in a file.",
+    )
 
     args = parser.parse_args()
     main(args)
