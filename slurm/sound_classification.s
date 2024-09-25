@@ -19,6 +19,8 @@ EMBEDDINGS_PATH="urbansound8k_1030.pt \
 
 TRAIN_MODES="zs tgap sv"
 
+MODALITY_MODES="audio text"
+
 TEMPERATURES="0.2 0.5 0.8"
 
 cd /scratch/ea3418/me-uyr-trans-exp/singularity-atm-da-51257214
@@ -34,12 +36,22 @@ conda activate atm-domain-adapt
 cd /scratch/ea3418/me-uyr-trans-exp/AudioText-ContextDomainAdaptation
 for embeddings_path in $EMBEDDINGS_PATH; do
     for train_mode in $TRAIN_MODES; do
-        for temperature in $TEMPERATURES; do
-            echo '-- Sound classification -- \$embeddings_path -- \$train_mode -- \$temperature --'
+        echo '-- NO Domain Adaptation Sound classification -- \$embeddings_path -- \$train_mode --'
+        python3 scripts/sound_classification.py --embeddings_path \$embeddings_path \
+                                                --dataset urbansound8k \
+                                                --mode \$train_mode \
+                                                --save_results True
+    done
+done
+for embeddings_path in $EMBEDDINGS_PATH; do
+    for train_mode in $TRAIN_MODES; do
+        for modality_mode in $MODALITY_MODES; do
+            echo '-- Domain Adaptation Sound classification -- \$embeddings_path -- \$train_mode -- \$modality_mode --'
             python3 scripts/sound_classification.py --embeddings_path \$embeddings_path \
                                                     --dataset urbansound8k \
                                                     --mode \$train_mode \
-                                                    --temperature \$temperature
+                                                    --modality \$modality_mode \
+                                                    --temperature \$temperature \
                                                     --bg_embeddings_path tau2019uas_1143.pt \
                                                     --save_results True
         done
