@@ -9,7 +9,6 @@
 #SBATCH --mem=18GB
 #SBATCH --output=/scratch/ea3418/sound_classification_%j.out
 
-
 EMBEDDINGS_PATH="urbansound8k_1030.pt \
                  urbansound8k-20240923151200_1038.pt \
                  urbansound8k-20240923161033_1054.pt \
@@ -45,5 +44,8 @@ for embeddings_path in $EMBEDDINGS_PATH; do
                                                     --temperature \$temperature
                                                     --background_embeddings_path $BACKGROUND_EMBEDDING_PATH \
                                                     --save_results True
+        done
+    done
+done
 echo 'Completed!'
 "
